@@ -1,0 +1,58 @@
+spec: "1.1"
+
+devices:
+  ah2700a:
+    eom:
+      GPIB INSTR:
+        q: "\n"
+        r: "\n"
+
+    dialogues:
+      - q: "*IDN?"
+        r: "ANDEEEN-HAGERLING,2700A,SIM0001,1.0"
+      - q: "*CLS"
+        r: "OK"
+      - q: "FUNC:IMP CPD"
+        r: "OK"
+      - q: "CONTINOUS ON"
+        r: "OK"
+      - q: "FETCH"
+        r: "0.960123,0.000110"
+
+    properties:
+      frequency:
+        default: "1000"
+        getter:
+          q: "FREQ?"
+          r: "{:s}"
+        setter:
+          q: "FREQ {:s}"
+          r: "OK"
+      voltage:
+        default: "15"
+        getter:
+          q: "VOLT?"
+          r: "{:s}"
+        setter:
+          q: "VOLT {:s}"
+          r: "OK"
+      average:
+        default: "4"
+        getter:
+          q: "AVG?"
+          r: "{:s}"
+        setter:
+          q: "AVG {:s}"
+          r: "OK"
+      units:
+        default: "PF"
+        getter:
+          q: "UNITS?"
+          r: "{:s}"
+        setter:
+          q: "UNITS {:s}"
+          r: "OK"
+
+resources:
+  GPIB0::22::INSTR:
+    device: ah2700a
