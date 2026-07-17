@@ -3,8 +3,10 @@ from typing import Optional
 
 from core.driver_base import InstrumentDriver
 from core.measurement import Measurement
+from core.registry import register_driver
 from protocols.scpi_protocol import SCPIProtocol
 
+@register_driver("ANDEEEN-HAGERLING")
 class AH2700ADriver(InstrumentDriver):
 
     PARAMETERS={

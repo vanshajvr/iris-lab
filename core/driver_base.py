@@ -7,6 +7,9 @@ class InstrumentDriver(ABC):
     PARAMETERS: dict={}
     OUTPUTS: dict={}
 
+    def __init__(self, visa_library: str=""):
+        self.visa_library=visa_library
+
     @abstractmethod
     def connect(self, resource_address: str) -> None:
         raise NotImplementedError

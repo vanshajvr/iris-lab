@@ -20,14 +20,12 @@ class ReplayDriver(InstrumentDriver):
         "loss": {"unit": ""},
     }
 
-    def __init__(self):
+    def __init__(self, visa_library: str=""):
         self.csv_path: Optional[str] = None
         self.loop = False
         self.rows: Optional[list[dict]] = None
         self._row_iter: Optional[Iterator[dict]] = None
 
-    # resource_address here is the CSV file path -- same call shape as a
-    # real driver's connect(), just a file instead of a GPIB/USB address.
     def connect(self, resource_address: str) -> None:
         self.csv_path = resource_address
         with open(self.csv_path, newline="") as f:
@@ -61,10 +59,6 @@ class ReplayDriver(InstrumentDriver):
                 "cycle, or reconnect() to restart from the beginning."
             )
 
-        # Real recorded timestamp, not datetime.now() -- this is the
-        # whole point of replay mode: preserving genuine acquisition
-        # timing, including the real gaps and startup artifacts, not
-        # synthetic evenly-spaced data.
         timestamp = datetime.strptime(row["Timestamp"], TIMESTAMP_FORMAT)
 
         return [
