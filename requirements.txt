@@ -1,2 +1,6 @@
 pyvisa
 pyvisa-sim
+pytest
+ayncua
+PySide6
+pyqtgraph
