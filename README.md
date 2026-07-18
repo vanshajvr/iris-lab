@@ -1,4 +1,4 @@
-# IRIS -- Instrument-agnostic Real-time Interface Suite
+# IRIS: Instrument-agnostic Real-time Interface Suite
 
 A Python framework for automating lab instruments through a shared driver
 interface. Swap the instrument, keep the framework -- adding support for a
