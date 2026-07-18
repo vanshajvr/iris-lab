@@ -216,3 +216,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Runtime-generated output, not source
+logs/
+data/
+.vscode/
+
