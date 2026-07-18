@@ -83,8 +83,6 @@ connection banner all tear down and rebuild automatically, sourced from
 `driver.get_outputs()` -- no code path branches on which instrument is
 active.
 
-*(GIF/screen recording of the live switch goes here.)*
-
 ## Getting started
 
 ```bash
