@@ -15,7 +15,7 @@ def test_identify_returns_expected_idn():
 def test_configure_and_measure_returns_capacitance_and_loss():
     d = AH2700ADriver(visa_library=SIM_VISA_LIBRARY)
     d.connect(SIM_RESOURCE_ADDRESS)
-    d.configure({"frequency": 1000, "voltage": 15, "average_count": 4, "units": "PF"})
+    d.configure({"frequency": 1000, "voltage": 15, "average_count": 4, "loss_mode": "PF"})
 
     readings = d.measure()
     d.disconnect()
@@ -23,9 +23,9 @@ def test_configure_and_measure_returns_capacitance_and_loss():
     assert len(readings) == 2
     cap = next(m for m in readings if m.quantity == "capacitance")
     loss = next(m for m in readings if m.quantity == "loss")
-    assert cap.value == 0.960123
+    assert abs(cap.value-0.960123)<0.001
     assert cap.unit == "pF"
-    assert loss.value == 0.000110
+    assert abs(loss.value-0.000110)<0.00001
     assert loss.unit == ""
 
 
@@ -44,7 +44,5 @@ def test_configure_rejects_unknown_parameter():
 def test_frequency_clamps_above_max():
     d = AH2700ADriver(visa_library=SIM_VISA_LIBRARY)
     d.connect(SIM_RESOURCE_ADDRESS)
-    # 25000 Hz exceeds the AH2700A's real 20 kHz max; configure() should
-    # clamp it rather than send an out-of-range command to the instrument.
     d.configure({"frequency": 25000})
     d.disconnect()

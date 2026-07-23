@@ -1,3 +1,4 @@
+import random
 from datetime import datetime
 from typing import Optional
 
@@ -13,7 +14,16 @@ class AH2700ADriver(InstrumentDriver):
         "frequency": {"type": "float", "unit": "Hz", "min": 50, "max": 20000, "clamp": True},
         "voltage": {"type": "float", "unit": "V", "min": -100, "max": 100},
         "average_count": {"type": "enum", "options": [4,7]},
-        "units": {"type": "enum", "options": ["PF"]}
+        "loss_mode": {
+            "type": "enum", 
+            "options": [
+                (1, "Conductance (nS)"),
+                (2, "Dissipation Factor (tan delta)"),
+                (3, "Series Resistance (kOhm)"),
+                (4, "Parallel Resistance (GOhm)"),
+                (5, "Loss Vector magnitude (jpF)")
+            ]
+        }
     }
 
     OUTPUTS={
@@ -53,27 +63,34 @@ class AH2700ADriver(InstrumentDriver):
         if "average_count" in params:
             self.protocol.query(f"VOLT {params['average_count']}")
 
-        if "units" in params:
-            self.protocol.query(f"UNITS {params['units']}")
+        if "loss_mode" in params:
+            self.protocol.query(f"UNITS {params['loss_mode']}")
 
         self.protocol.query("CONTINOUS ON")
 
     def measure(self) -> list[Measurement]:
         raw=self.protocol.query("FETCH")
         cap_str, loss_str=raw.split(",")
+        cap_value = float(cap_str)
+        loss_value = float(loss_str)
+
+        if "@sim" in self.protocol.visa_library:
+            cap_value+=random.gauss(0,0.00003)
+            loss_value+=random.gauss(0,0.0000005)
+
         now=datetime.now()
 
         return[
             Measurement(
                 quantity="capacitance",
-                value=float(cap_str),
+                value=cap_value,
                 unit="pF",
                 timestamp=now,
                 instrument_id=self.resource_address
             ),
             Measurement(
                 quantity="loss",
-                value=float(loss_str),
+                value=loss_value,
                 unit="",
                 timestamp=now,
                 instrument_id=self.resource_address
