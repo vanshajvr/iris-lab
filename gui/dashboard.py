@@ -173,6 +173,7 @@ class DashboardWindow(QMainWindow):
     def _rebuild_dynamic_ui(self) -> None:
         self._clear_dynamic_layout()
         self.value_labels={}
+        self.plot_widgets={}
         self.plot_curves={}
         self.plot_data={}
 
@@ -193,13 +194,23 @@ class DashboardWindow(QMainWindow):
             color=CURVE_COLORS[i%len(CURVE_COLORS)]
             plot=pg.PlotWidget(title=quantity)
             plot.setBackground("#101010")
+            plot.enableAutoRange(y=False)
             curve=plot.plot(pen=pg.mkPen(color, width=2))
             self.dynamic_layout.addWidget(plot)
+            self.plot_widgets[quantity]=plot
             self.plot_curves[quantity]=curve
             self.plot_data[quantity]=[]
 
     
-
+    def _rescale_plot(self,quantity:str,values:list[float]) -> None:
+        if quantity not in self.plot_widgets or not values:
+            return
+        lo,hi=min(values),max(values)
+        if lo==hi:
+            pad=abs(lo)*0.001 if lo!=0 else 0.001
+        else:
+            pad=(hi-lo)*0.1
+        self.plot_widgets[quantity].setYRange(lo-pad,hi+pad,padding=0)
 
     def poll(self) -> None:
         if self.driver is None:
@@ -211,12 +222,13 @@ class DashboardWindow(QMainWindow):
                     continue
                 unit=f"{m.unit}" if m.unit else ""
                 self.value_labels[m.quantity].setText(
-                    f"{m.quantity}: {m.value}{unit}"
+                    f"{m.quantity}: {m.value:.6f}{unit}"
                 )
                 self.plot_data[m.quantity].append(m.value)
                 trimmed=self.plot_data[m.quantity][-MAX_POINTS:]
                 self.plot_data[m.quantity]=trimmed
                 self.plot_curves[m.quantity].setData(trimmed)
+                self._rescale_plot(m.quantity,trimmed)
         except Exception as e:
             self.log(f"Measurement error: {e}")
 
